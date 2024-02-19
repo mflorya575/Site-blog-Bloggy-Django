@@ -1,5 +1,10 @@
 from django.db import models
+from django.utils import timezone
+from django.core.validators import FileExtensionValidator
+from django.contrib.auth.models import User
+from django.urls import reverse
 from mptt.models import MPTTModel, TreeForeignKey
+from apps.services.utils import unique_slugify
 
 
 class Category(MPTTModel):
@@ -51,13 +56,44 @@ class Post(models.Model):
     )
 
     title = models.CharField(verbose_name='Название записи', max_length=255)
-    slug = models.SlugField(verbose_name='URL', max_length=255, blank=True, unique=True)
+    slug = models.SlugField(verbose_name='URL', max_length=255, blank=True)
     description = models.TextField(verbose_name='Краткое описание', max_length=500)
     text = models.TextField(verbose_name='Полный текст записи')
     category = TreeForeignKey('Category', on_delete=models.PROTECT, related_name='posts', verbose_name='Категория')
+    thumbnail = models.ImageField(
+        verbose_name='Изображение записи',
+        blank=True,
+        upload_to='images/thumbnails/%Y/%m/%d/',
+        validators=[FileExtensionValidator(allowed_extensions=('png', 'jpg', 'webp', 'jpeg', 'gif'))]
+    )
+    upload_to = 'images/thumbnails/%Y/%m/%d/',
+    status = models.CharField(choices=STATUS_OPTIONS, default='published', verbose_name='Статус записи', max_length=10)
+    create = models.DateTimeField(verbose_name='Время добавления', default=timezone.now)
+    author = models.ForeignKey(to=User, verbose_name='Автор', on_delete=models.SET_DEFAULT, related_name='author_posts',
+                               default=1)
+    fixed = models.BooleanField(verbose_name='Прикреплено', default=False)
 
     class Meta:
-        verbose_name = 'Блог'
-        verbose_name_plural = 'Блоги'
+        db_table = 'blog_post'
+        ordering = ['-fixed', '-create']
+        indexes = [models.Index(fields=['-fixed', '-create', 'status'])]
+        verbose_name = 'Статья'
+        verbose_name_plural = 'Статьи'
+
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        """
+        Получаем прямую ссылку на статью
+        """
+        return reverse('post_detail', kwargs={'slug': self.slug})
+
+    def save(self, *args, **kwargs):
+        """
+        Сохранение полей модели при их отсутствии заполнения
+        """
+        self.slug = unique_slugify(self, self.title)
+        super().save(*args, **kwargs)
 
 # Create your models here.
