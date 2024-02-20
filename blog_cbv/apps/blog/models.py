@@ -89,6 +89,8 @@ class Post(models.Model):
     create = models.DateTimeField(verbose_name='Время добавления', default=timezone.now)
     author = models.ForeignKey(to=User, verbose_name='Автор', on_delete=models.SET_DEFAULT, related_name='author_posts',
                                default=1)
+    updater = models.ForeignKey(to=User, verbose_name='Обновил', on_delete=models.SET_NULL, null=True,
+                                related_name='updater_posts', blank=True)
     fixed = models.BooleanField(verbose_name='Прикреплено', default=False)
 
     objects = models.Manager()
