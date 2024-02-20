@@ -7,7 +7,8 @@ class PostListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
-    paginate_by = 2
+    paginate_by = 7
+    queryset = Post.custom.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -32,6 +33,7 @@ class PostFromCategory(ListView):
     context_object_name = 'posts'
     category = None
     paginate_by = 1
+    queryset = Post.custom.all()
 
     def get_queryset(self):
         self.category = Category.objects.get(slug=self.kwargs['slug'])
