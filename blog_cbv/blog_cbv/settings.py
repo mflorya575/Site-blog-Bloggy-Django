@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'apps.accounts',
     'taggit',
+    'django_recaptcha',
 ]
 
 MIDDLEWARE = [
@@ -137,3 +138,6 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+RECAPTCHA_PUBLIC_KEY = '6LcTS3spAAAAAKBMGYD2GLY9tLJxGkSfB1rUfdUD'
+RECAPTCHA_PRIVATE_KEY = '6LcTS3spAAAAAF69N0CWzVPMQg8yoBii90INBgsI'
