@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from .models import Post, Category
 from .forms import PostCreateForm, PostUpdateForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 
 
 class PostListView(ListView):
@@ -50,13 +52,14 @@ class PostFromCategory(ListView):
         return context
 
 
-class PostCreateView(CreateView):
+class PostCreateView(LoginRequiredMixin, CreateView):
     """
     Представление: создание материалов на сайте
     """
     model = Post
     template_name = 'blog/post_create.html'
     form_class = PostCreateForm
+    login_url = 'home'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -69,7 +72,7 @@ class PostCreateView(CreateView):
         return super().form_valid(form)
 
 
-class PostUpdateView(UpdateView):
+class PostUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     """
     Представление: обновления материала на сайте
     """
@@ -77,6 +80,8 @@ class PostUpdateView(UpdateView):
     template_name = 'blog/post_update.html'
     context_object_name = 'post'
     form_class = PostUpdateForm
+    login_url = 'home'
+    success_message = 'Запись была успешно обновлена!'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
