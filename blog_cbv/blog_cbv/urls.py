@@ -21,6 +21,11 @@ from django.conf import settings
 from apps.blog.feeds import LatestPostFeed
 
 
+handler403 = 'apps.blog.views.tr_handler403'
+handler404 = 'apps.blog.views.tr_handler404'
+handler500 = 'apps.blog.views.tr_handler500'
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('apps.blog.urls')),
